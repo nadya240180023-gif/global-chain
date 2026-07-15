@@ -11,11 +11,19 @@ return new class extends Migration
      */
     public function up(): void
 {
-    Schema::create('countries', function (Blueprint $table) {
+    Schema::create('gdp_data', function (Blueprint $table) {
         $table->id();
-        $table->string('country_name');
-        $table->string('country_code',10)->unique();
-        $table->string('currency',20)->nullable();
+
+        $table->foreignId('country_id')
+              ->constrained()
+              ->cascadeOnDelete();
+
+        $table->year('year');
+
+        $table->decimal('gdp_value', 18, 2)->nullable();
+
+        $table->decimal('gdp_growth', 8, 2)->nullable();
+
         $table->timestamps();
     });
 }
@@ -25,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('countries');
+        Schema::dropIfExists('gdp_data');
     }
 };

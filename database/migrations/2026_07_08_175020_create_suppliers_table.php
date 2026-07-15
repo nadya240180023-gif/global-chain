@@ -13,16 +13,12 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('country_id')
-                ->constrained()
-                ->cascadeOnDelete();
-
-            $table->string('supplier_name');
-            $table->text('address')->nullable();
+            $table->string('kode_supplier')->unique();
+            $table->string('nama_supplier');
             $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-
+            $table->string('telepon');
+            $table->text('alamat')->nullable();
+            $table->enum('status', ['Aktif', 'Nonaktif'])->default('Aktif');
             $table->timestamps();
         });
     }
