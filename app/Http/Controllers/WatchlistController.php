@@ -36,7 +36,12 @@ class WatchlistController extends Controller
                 ];
             });
 
-        return view('watchlist.index', compact('watchlistCountries'));
+        // Fetch countries NOT in the user's watchlist for the quick-add selector
+        $availableCountries = Country::whereNotIn('id', $watchlistIds)
+            ->orderBy('name')
+            ->get();
+
+        return view('watchlist.index', compact('watchlistCountries', 'availableCountries'));
     }
 
     public function toggle(Country $country)

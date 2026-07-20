@@ -19,8 +19,18 @@ class WeatherController extends Controller
     public function index(Request $request)
     {
         $countries = Country::orderBy('name')->get();
-        $selectedCode = $request->query('country', 'ID');
-        $selectedCountry = Country::where('code', strtoupper($selectedCode))->first();
+        
+        // Fallback to default ID if request has no country parameter or country is empty
+        if (!$request->has('country') || empty(trim($request->query('country')))) {
+            $selectedCountry = Country::where('code', 'ID')->first();
+        } else {
+            $countryQuery = trim($request->query('country'));
+            // Find exact code match first, then search by exact name, then partial name
+            $selectedCountry = Country::where('code', strtoupper($countryQuery))
+                ->orWhere('name', $countryQuery)
+                ->orWhere('name', 'like', '%' . $countryQuery . '%')
+                ->first();
+        }
 
         if (!$selectedCountry && $countries->isNotEmpty()) {
             $selectedCountry = $countries->first();

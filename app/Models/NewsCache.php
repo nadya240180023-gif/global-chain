@@ -17,6 +17,7 @@ class NewsCache extends Model
         'description',
         'content',
         'url',
+        'image_url',
         'source',
         'published_at',
         'category',

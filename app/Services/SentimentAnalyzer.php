@@ -38,10 +38,10 @@ class SentimentAnalyzer
 
         // Default list if database is not populated yet
         if (empty($positiveLexicon)) {
-            $positiveLexicon = ['growth', 'increase', 'profit', 'stable', 'improve', 'success', 'positive', 'gain', 'recovery', 'strong', 'expansion'];
+            $positiveLexicon = ['pertumbuhan', 'stabil', 'pemulihan', 'keuntungan', 'solid', 'sukses', 'optimis', 'meningkat', 'efisiensi', 'kerjasama'];
         }
         if (empty($negativeLexicon)) {
-            $negativeLexicon = ['war', 'crisis', 'inflation', 'delay', 'disaster', 'conflict', 'decrease', 'loss', 'negative', 'weak', 'drop', 'recession', 'strike', 'congestion', 'storm'];
+            $negativeLexicon = ['krisis', 'memburuk', 'resesi', 'lemah', 'penurunan', 'kepadatan', 'penundaan', 'penumpukan', 'mogok', 'bencana', 'badai', 'peringatan', 'konflik', 'sanksi', 'risiko'];
         }
 
         $posMatches = [];

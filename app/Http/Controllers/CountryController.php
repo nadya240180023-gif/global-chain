@@ -19,6 +19,17 @@ class CountryController extends Controller
     }
 
     /**
+     * Display a listing of countries (Data Negara).
+     */
+    public function data()
+    {
+        $countries = Country::with(['gdpData' => function($q) {
+            $q->orderBy('year', 'desc');
+        }])->orderBy('name')->get();
+        return view('countries.data', compact('countries'));
+    }
+
+    /**
      * Display a listing of countries with their risk scores.
      */
     public function index()

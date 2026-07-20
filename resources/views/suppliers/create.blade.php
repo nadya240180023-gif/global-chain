@@ -1,88 +1,71 @@
-@extends('adminlte::page')
+@extends('layouts.app')
 
-@section('title', 'Tambah Supplier')
-
-@section('content_header')
-<h1>Tambah Supplier</h1>
-@stop
+@section('title', 'Tambah Supplier Baru')
 
 @section('content')
-
-<div class="card">
-
-    <div class="card-header">
-        <h3 class="card-title">Form Tambah Supplier</h3>
-    </div>
-
-    <form action="{{ route('suppliers.store') }}" method="POST">
-        @csrf
-
-        <div class="card-body">
-
-            <div class="form-group">
-                <label>Kode Supplier</label>
-                <input type="text"
-                       name="kode_supplier"
-                       class="form-control"
-                       value="{{ old('kode_supplier') }}"
-                       required>
+<div class="max-w-2xl mx-auto">
+    <div class="bg-slate-50 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-200">
+            <h3 class="font-bold text-slate-800 text-base">Formulir Pendaftaran Supplier</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Isi seluruh data di bawah untuk mendaftarkan supplier baru ke dalam sistem.</p>
+        </div>
+        <form action="{{ route('suppliers.store') }}" method="POST" class="p-6 space-y-5">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label for="kode_supplier" class="text-xs font-bold text-slate-400 block mb-1.5">Kode Supplier *</label>
+                    <input type="text" id="kode_supplier" name="kode_supplier" value="{{ old('kode_supplier') }}" required
+                           class="w-full border @error('kode_supplier') border-rose-400 @else border-slate-300 @enderror rounded-lg text-sm p-2.5 focus:ring-purple-500 focus:border-purple-500"
+                           placeholder="SUP-XX01">
+                    @error('kode_supplier') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="nama_supplier" class="text-xs font-bold text-slate-400 block mb-1.5">Nama Supplier *</label>
+                    <input type="text" id="nama_supplier" name="nama_supplier" value="{{ old('nama_supplier') }}" required
+                           class="w-full border @error('nama_supplier') border-rose-400 @else border-slate-300 @enderror rounded-lg text-sm p-2.5 focus:ring-purple-500 focus:border-purple-500"
+                           placeholder="PT. Contoh Supplier">
+                    @error('nama_supplier') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                </div>
             </div>
-
-            <div class="form-group">
-                <label>Nama Supplier</label>
-                <input type="text"
-                       name="nama_supplier"
-                       class="form-control"
-                       value="{{ old('nama_supplier') }}"
-                       required>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label for="email" class="text-xs font-bold text-slate-400 block mb-1.5">Email</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}"
+                           class="w-full border @error('email') border-rose-400 @else border-slate-300 @enderror rounded-lg text-sm p-2.5 focus:ring-purple-500 focus:border-purple-500"
+                           placeholder="kontak@supplier.com">
+                    @error('email') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="telepon" class="text-xs font-bold text-slate-400 block mb-1.5">Nomor Telepon *</label>
+                    <input type="text" id="telepon" name="telepon" value="{{ old('telepon') }}" required
+                           class="w-full border @error('telepon') border-rose-400 @else border-slate-300 @enderror rounded-lg text-sm p-2.5 focus:ring-purple-500 focus:border-purple-500"
+                           placeholder="+62 xxx-xxxx-xxxx">
+                    @error('telepon') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                </div>
             </div>
-
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email"
-                       name="email"
-                       class="form-control"
-                       value="{{ old('email') }}">
+            <div>
+                <label for="alamat" class="text-xs font-bold text-slate-400 block mb-1.5">Alamat Lengkap</label>
+                <textarea id="alamat" name="alamat" rows="3"
+                          class="w-full border border-slate-300 rounded-lg text-sm p-2.5 focus:ring-purple-500 focus:border-purple-500 resize-none"
+                          placeholder="Kota, Provinsi, Negara">{{ old('alamat') }}</textarea>
             </div>
-
-            <div class="form-group">
-                <label>Telepon</label>
-                <input type="text"
-                       name="telepon"
-                       class="form-control"
-                       value="{{ old('telepon') }}"
-                       required>
-            </div>
-
-            <div class="form-group">
-                <label>Alamat</label>
-                <textarea name="alamat"
-                          class="form-control"
-                          rows="3">{{ old('alamat') }}</textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Status</label>
-                <select name="status" class="form-control">
-                    <option value="Aktif">Aktif</option>
-                    <option value="Nonaktif">Nonaktif</option>
+            <div>
+                <label for="status" class="text-xs font-bold text-slate-400 block mb-1.5">Status *</label>
+                <select id="status" name="status" class="bg-slate-100 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5">
+                    <option value="Aktif" {{ old('status') === 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                    <option value="Nonaktif" {{ old('status') === 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                 </select>
             </div>
-
-        </div>
-
-        <div class="card-footer">
-            <button type="submit" class="btn btn-success">
-                <i class="fas fa-save"></i> Simpan
-            </button>
-
-            <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">
-                Kembali
-            </a>
-        </div>
-
-    </form>
-
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-slate-800 font-bold px-6 py-2.5 rounded-lg text-sm transition-all cursor-pointer flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Simpan Supplier
+                </button>
+                <a href="{{ route('suppliers.index') }}" class="text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 font-bold px-5 py-2.5 rounded-lg text-sm transition-all">
+                    Batal
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
-
-@stop
+@endsection

@@ -8,10 +8,21 @@ use App\Models\WeatherData;
 use App\Models\ExchangeRate;
 use App\Models\GdpData;
 use App\Models\InflationData;
+use App\Services\ApiSyncService;
+use App\Services\RiskScoringEngine;
 use Illuminate\Http\Request;
 
 class ComparisonController extends Controller
 {
+    protected $apiSync;
+    protected $scoringEngine;
+
+    public function __construct(ApiSyncService $apiSync, RiskScoringEngine $scoringEngine)
+    {
+        $this->apiSync = $apiSync;
+        $this->scoringEngine = $scoringEngine;
+    }
+
     public function index(Request $request)
     {
         $countries = Country::orderBy('name')->get();
@@ -25,10 +36,27 @@ class ComparisonController extends Controller
         if (!$country1 && $countries->isNotEmpty()) $country1 = $countries->first();
         if (!$country2 && $countries->count() > 1)  $country2 = $countries->get(1);
 
+        // Real-time synchronization & recalculation for compared countries
+        foreach ([$country1, $country2] as $country) {
+            if ($country) {
+                try {
+                    // Sync weather, World Bank indicators, news and recalculate risk score on-the-fly
+                    $this->apiSync->syncWeatherData($country);
+                    $this->apiSync->syncWorldBankData($country);
+                    $this->apiSync->syncNews($country);
+                    $this->scoringEngine->calculate($country);
+                } catch (\Exception $e) {
+                    // Fail silently or log error, keep showing existing DB data if API fails
+                    logger()->error("Failed to sync real-time data for " . $country->name . ": " . $e->getMessage());
+                }
+            }
+        }
+
         $compareData = [];
 
         foreach (['country1' => $country1, 'country2' => $country2] as $key => $country) {
             if ($country) {
+                // Fetch the newly updated data from database
                 $latestWeather   = WeatherData::where('country_id', $country->id)->orderBy('recorded_at', 'desc')->first();
                 $latestRate      = ExchangeRate::where('country_id', $country->id)->orderBy('recorded_at', 'desc')->first();
                 $latestGdp       = GdpData::where('country_id', $country->id)->orderBy('year', 'desc')->first();

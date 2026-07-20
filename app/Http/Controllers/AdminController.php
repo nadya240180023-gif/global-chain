@@ -14,16 +14,23 @@ use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function usersIndex()
     {
         $users = User::all();
+        return view('admin.users', compact('users'));
+    }
+
+    public function portsIndex()
+    {
         $ports = Port::with('country')->orderBy('name')->get();
         $countries = Country::orderBy('name')->get();
-        $positiveWords = PositiveWord::orderBy('word')->get();
-        $negativeWords = NegativeWord::orderBy('word')->get();
-        $articles = Article::with('author')->orderBy('created_at', 'desc')->get();
+        return view('admin.ports', compact('ports', 'countries'));
+    }
 
-        return view('admin.index', compact('users', 'ports', 'countries', 'positiveWords', 'negativeWords', 'articles'));
+    public function articlesIndex()
+    {
+        $articles = Article::with('author')->orderBy('created_at', 'desc')->get();
+        return view('admin.articles', compact('articles'));
     }
 
     public function toggleUserStatus(User $user)
@@ -35,6 +42,23 @@ class AdminController extends Controller
 
         $user->delete();
         return redirect()->back()->with('success', 'User berhasil dihapus.');
+    }
+
+    public function storeUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        ]);
+
+        return redirect()->back()->with('success', 'Pengguna baru berhasil ditambahkan.');
     }
 
     public function storePort(Request $request)

@@ -109,6 +109,11 @@ class DashboardController extends Controller
         // Top 5 Highest Risk Countries
         $top5Countries = $latestScores->sortByDesc('total_score')->take(5);
 
+        // Admin statistics (Users and Articles)
+        $totalUsers = \App\Models\User::count();
+        $totalArticles = \App\Models\Article::count();
+        $totalPorts = \App\Models\Port::count();
+
         // Global Indicators
         $globalGdpValue = GdpData::whereIn('id', function($q) {
             $q->selectRaw('MAX(id)')->from('gdp_data')->groupBy('country_id');
@@ -170,7 +175,10 @@ class DashboardController extends Controller
             'extremeWeather',
             'currencyHistory',
             'allPorts',
-            'recentNews'
+            'recentNews',
+            'totalUsers',
+            'totalArticles',
+            'totalPorts'
         ));
     }
 }

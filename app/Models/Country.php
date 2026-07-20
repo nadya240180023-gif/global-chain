@@ -51,4 +51,19 @@ class Country extends Model
     {
         return $this->hasMany(RiskScore::class);
     }
+
+    public function newsCache()
+    {
+        return $this->hasMany(NewsCache::class);
+    }
+
+    public function populationData()
+    {
+        return $this->hasMany(PopulationData::class);
+    }
+
+    public function ports()
+    {
+        return $this->hasMany(Port::class);
+    }
 }
