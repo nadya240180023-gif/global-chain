@@ -51,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
     // Admin Dashboard / Kelola User
     Route::get('/admin/users', [AdminController::class, 'usersIndex'])->name('admin.users.index');
     Route::post('/admin/users', [AdminController::class, 'storeUser'])->name('admin.user.store');
+    Route::post('/admin/users/{user}/update', [AdminController::class, 'updateUser'])->name('admin.user.update');
     Route::post('/admin/users/{user}/toggle', [AdminController::class, 'toggleUserStatus'])->name('admin.user.toggle');
 
     // Kelola Dataset Pelabuhan
@@ -62,6 +63,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/articles', [AdminController::class, 'articlesIndex'])->name('admin.articles.index');
     Route::post('/admin/articles', [AdminController::class, 'storeArticle'])->name('admin.articles.store');
     Route::delete('/admin/articles/{article}', [AdminController::class, 'destroyArticle'])->name('admin.articles.destroy');
+
+    // Kelola Kamus Sentimen
+    Route::get('/admin/words', [AdminController::class, 'wordsIndex'])->name('admin.words.index');
+    Route::post('/admin/words', [AdminController::class, 'storeWord'])->name('admin.words.store');
+    Route::delete('/admin/words/{type}/{word}', [AdminController::class, 'destroyWord'])->name('admin.words.destroy');
 
     // Profile CRUD
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

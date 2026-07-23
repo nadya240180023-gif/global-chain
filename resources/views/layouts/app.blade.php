@@ -217,6 +217,12 @@
                     </div>
                     Kelola Artikel
                 </a>
+                <a href="{{ route('admin.words.index') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 transition-all {{ Request::routeIs('admin.words.index') ? 'sidebar-link-active' : '' }}">
+                    <div class="w-7 h-7 rounded-lg bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-700/50">
+                        <i class="fa-solid fa-book-atlas text-indigo-400 text-sm"></i>
+                    </div>
+                    Kelola Kamus
+                </a>
             @endif
             <div class="px-4 mb-2 mt-6">
                 <span class="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Akun</span>

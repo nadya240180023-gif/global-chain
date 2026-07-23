@@ -38,7 +38,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button class="bg-blue-600 hover:bg-blue-700 text-slate-800 font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-100">
+            <x-primary-button class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-100">
                 {{ __('Simpan Kata Sandi') }}
             </x-primary-button>
 

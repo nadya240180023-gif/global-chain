@@ -104,28 +104,117 @@
     </div>
 
     {{-- SEARCH BAR SECTION --}}
-    <div class="gold-accent p-3 flex items-center gap-2">
-        <form action="{{ route('weather.index') }}" method="GET" class="flex-1 flex flex-col md:flex-row md:items-center gap-3 w-full pl-4">
-            <div class="flex-1 flex items-center gap-3 relative">
-                <i class="fa-solid fa-location-dot text-slate-400"></i>
-                <input type="text" name="country" id="country_search" list="country_list" 
-                       placeholder="Ketik nama atau kode negara (contoh: Indonesia)..."
+    <div class="gold-accent p-4 relative" id="search-container">
+        <form action="{{ route('weather.index') }}" method="GET" id="weather-search-form" class="w-full">
+            <div class="relative w-full">
+                <i class="fa-solid fa-earth-asia absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-20"></i>
+                
+                {{-- Search Input --}}
+                <input type="text" 
+                       id="weather-search-input"
+                       placeholder="Ketik nama negara untuk mencari..."
                        value="{{ $selectedCountry ? $selectedCountry->name : '' }}"
-                       class="w-full bg-transparent border-none focus:ring-0 text-slate-700 font-semibold pl-2 outline-none cursor-pointer placeholder-slate-400"
+                       class="w-full bg-slate-50 border border-slate-200 text-slate-700 font-bold rounded-2xl py-3.5 pl-11 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-text placeholder-slate-400 z-10"
                        autocomplete="off">
                 
-                <datalist id="country_list">
+                {{-- Hidden input with ID --}}
+                <input type="hidden" name="country" id="hidden-country-code" value="{{ $selectedCountry ? $selectedCountry->code : '' }}">
+                
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 z-20">
+                    <i class="fa-solid fa-chevron-down text-sm"></i>
+                </div>
+
+                {{-- Custom Dropdown List --}}
+                <div id="weather-dropdown-list" 
+                     class="absolute left-0 right-0 mt-2 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-2 custom-scrollbar hidden">
                     @foreach($countries as $c)
-                        <option value="{{ $c->name }}"></option>
-                        <option value="{{ $c->code }}"></option>
+                        <div class="dropdown-item px-4 py-2.5 hover:bg-slate-50 text-slate-700 font-bold text-sm cursor-pointer transition-colors flex items-center justify-between"
+                             data-name="{{ strtolower($c->name) }}"
+                             data-code="{{ $c->code }}"
+                             data-fullname="{{ $c->name }}">
+                            <span>{{ $c->name }}</span>
+                            <span class="text-xs text-slate-400 font-normal">{{ $c->code }}</span>
+                        </div>
                     @endforeach
-                </datalist>
+                </div>
             </div>
-            <button type="submit" class="bg-[#064e3b] text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-[#065f46] transition-colors shrink-0 shadow-lg shadow-emerald-900/20">
-                <i class="fa-solid fa-magnifying-glass"></i> Cari Data
-            </button>
         </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById('weather-search-input');
+            const dropdownList = document.getElementById('weather-dropdown-list');
+            const hiddenCode = document.getElementById('hidden-country-code');
+            const searchForm = document.getElementById('weather-search-form');
+            const items = dropdownList.querySelectorAll('.dropdown-item');
+
+            if (!searchInput || !dropdownList) return;
+
+            // Show dropdown on focus
+            searchInput.addEventListener('focus', function() {
+                dropdownList.classList.remove('hidden');
+            });
+
+            // Filter items on input
+            searchInput.addEventListener('input', function() {
+                const term = searchInput.value.toLowerCase();
+                items.forEach(item => {
+                    const name = item.getAttribute('data-name');
+                    if (name.includes(term)) {
+                        item.classList.remove('hidden');
+                        item.style.display = 'flex';
+                    } else {
+                        item.classList.add('hidden');
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Handle selection
+            items.forEach(item => {
+                item.addEventListener('mousedown', function(e) {
+                    const fullname = item.getAttribute('data-fullname');
+                    const code = item.getAttribute('data-code');
+                    
+                    searchInput.value = fullname;
+                    hiddenCode.value = code;
+                    
+                    dropdownList.classList.add('hidden');
+                    searchForm.submit();
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                const container = document.getElementById('search-container');
+                if (container && !container.contains(e.target)) {
+                    dropdownList.classList.add('hidden');
+                }
+            });
+
+            // Handle enter key
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const term = searchInput.value.toLowerCase();
+                    // Find first visible item
+                    let matchedItem = null;
+                    for (let i = 0; i < items.length; i++) {
+                        if (!items[i].classList.contains('hidden')) {
+                            matchedItem = items[i];
+                            break;
+                        }
+                    }
+                    if (matchedItem) {
+                        searchInput.value = matchedItem.getAttribute('data-fullname');
+                        hiddenCode.value = matchedItem.getAttribute('data-code');
+                        searchForm.submit();
+                    }
+                }
+            });
+        });
+    </script>
 
     {{-- 6 VERTICAL CARDS --}}
     @php

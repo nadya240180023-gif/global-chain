@@ -20,6 +20,13 @@ class AdminController extends Controller
         return view('admin.users', compact('users'));
     }
 
+    public function wordsIndex()
+    {
+        $positiveWords = PositiveWord::orderBy('word')->get();
+        $negativeWords = NegativeWord::orderBy('word')->get();
+        return view('admin.words', compact('positiveWords', 'negativeWords'));
+    }
+
     public function portsIndex()
     {
         $ports = Port::with('country')->orderBy('name')->get();
@@ -59,6 +66,33 @@ class AdminController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Pengguna baru berhasil ditambahkan.');
+    }
+
+    public function updateUser(Request $request, User $user)
+    {
+        // Don't allow changing primary admin email to prevent lockouts
+        $isAdmin = $user->email === 'admin@gsc.com';
+
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8',
+        ];
+
+        $request->validate($rules);
+
+        $user->name = $request->name;
+        if (!$isAdmin) {
+            $user->email = $request->email;
+        }
+        
+        if ($request->filled('password')) {
+            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Informasi pengguna berhasil diperbarui.');
     }
 
     public function storePort(Request $request)

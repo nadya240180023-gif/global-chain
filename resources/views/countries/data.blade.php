@@ -216,15 +216,19 @@
                                 {{-- Risk Score --}}
                                 <td class="px-4 py-4 text-center">
                                     @if($score)
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold {{ $riskCfg['badge'] }}">
+                                        <a href="{{ route('countries.sync_single', $country->id) }}" 
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold {{ $riskCfg['badge'] }} hover:scale-105 transition-all shadow-sm"
+                                           title="Klik untuk Perbarui Data & Kalkulasi Ulang Risiko">
                                             <span class="w-2 h-2 rounded-full {{ $riskCfg['dot'] }}"></span>
                                             {{ $score->total_score }} &bull; {{ $level }}
-                                        </span>
+                                        </a>
                                     @else
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200
-                                                     bg-slate-100 text-slate-400 text-xs font-semibold">
+                                        <a href="{{ route('countries.sync_single', $country->id) }}" 
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200
+                                                        bg-slate-100 text-slate-400 hover:text-slate-600 hover:border-slate-300 hover:bg-slate-50 text-xs font-semibold hover:scale-105 transition-all shadow-sm"
+                                           title="Klik untuk Kalkulasi Risiko Negara Ini">
                                             <i class="fa-regular fa-clock"></i> Pending
-                                        </span>
+                                        </a>
                                     @endif
                                 </td>
 
