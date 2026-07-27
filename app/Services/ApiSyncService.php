@@ -219,6 +219,15 @@ class ApiSyncService
     {
         if ($country->latitude === null || $country->longitude === null) return false;
 
+        // Cache check: if we have weather data recorded in the last 30 minutes, skip the API call
+        $recentWeather = WeatherData::where('country_id', $country->id)
+            ->where('recorded_at', '>=', Carbon::now()->subMinutes(30))
+            ->exists();
+
+        if ($recentWeather) {
+            return true;
+        }
+
         try {
             $response = Http::timeout(20)->withoutVerifying()
                 ->get("https://api.open-meteo.com/v1/forecast", [

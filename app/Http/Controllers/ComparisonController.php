@@ -36,6 +36,13 @@ class ComparisonController extends Controller
         if (!$country1 && $countries->isNotEmpty()) $country1 = $countries->first();
         if (!$country2 && $countries->count() > 1)  $country2 = $countries->get(1);
 
+        // Trigger real-time sync of all exchange rates from open.er-api.com on load
+        try {
+            $this->apiSync->syncExchangeRates();
+        } catch (\Exception $e) {
+            logger()->error("ComparisonController failed to sync exchange rates real-time: " . $e->getMessage());
+        }
+
         // Real-time synchronization & recalculation for compared countries
         foreach ([$country1, $country2] as $country) {
             if ($country) {
@@ -65,7 +72,12 @@ class ComparisonController extends Controller
 
                 $gdpHistory       = GdpData::where('country_id', $country->id)->orderBy('year', 'asc')->take(10)->get();
                 $inflationHistory = InflationData::where('country_id', $country->id)->orderBy('year', 'asc')->take(10)->get();
-                $exchangeHistory  = ExchangeRate::where('country_id', $country->id)->orderBy('recorded_at', 'asc')->take(15)->get();
+                $exchangeHistory  = ExchangeRate::where('country_id', $country->id)
+                    ->orderBy('recorded_at', 'desc')
+                    ->take(15)
+                    ->get()
+                    ->reverse()
+                    ->values();
 
                 $compareData[$key] = [
                     'model'            => $country,

@@ -76,6 +76,45 @@
         </form>
     </div>
 
+    {{-- ===== PORT STATISTICS CARDS ===== --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {{-- Total Ports --}}
+        <div class="bg-white rounded-3xl p-5 border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between min-h-[120px] relative overflow-hidden group">
+            <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Jumlah Port</span>
+            <div class="text-4xl font-black text-slate-800 mt-2">{{ $totalPorts }}</div>
+            <div class="absolute right-4 bottom-4 opacity-5 text-slate-900 text-6xl">
+                <i class="fa-solid fa-anchor"></i>
+            </div>
+        </div>
+
+        {{-- Congested/Delayed --}}
+        <div class="bg-white rounded-3xl p-5 border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between min-h-[120px] relative overflow-hidden group">
+            <span class="text-xs font-bold uppercase tracking-wide text-rose-500">Macet/Tertunda</span>
+            <div class="text-4xl font-black text-rose-600 mt-2">{{ $congestedPorts }}</div>
+            <div class="absolute right-4 bottom-4 opacity-5 text-rose-600 text-6xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+        </div>
+
+        {{-- Busy --}}
+        <div class="bg-white rounded-3xl p-5 border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between min-h-[120px] relative overflow-hidden group">
+            <span class="text-xs font-bold uppercase tracking-wide text-amber-500">Pelabuhan Sibuk</span>
+            <div class="text-4xl font-black text-amber-600 mt-2">{{ $busyPorts }}</div>
+            <div class="absolute right-4 bottom-4 opacity-5 text-amber-600 text-6xl">
+                <i class="fa-solid fa-truck-ramp-box"></i>
+            </div>
+        </div>
+
+        {{-- Normal --}}
+        <div class="bg-white rounded-3xl p-5 border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between min-h-[120px] relative overflow-hidden group">
+            <span class="text-xs font-bold uppercase tracking-wide text-emerald-500">Status Normal</span>
+            <div class="text-4xl font-black text-emerald-600 mt-2">{{ $normalPorts }}</div>
+            <div class="absolute right-4 bottom-4 opacity-5 text-emerald-600 text-6xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+    </div>
+
     {{-- ===== WORLD PORT MAP ===== --}}
     <div class="rounded-2xl overflow-hidden" style="border:1px solid rgba(99,102,241,0.25);box-shadow:0 8px 48px rgba(0,0,0,0.5);">
 
@@ -144,11 +183,29 @@
                             <span class="text-xs font-black tracking-widest text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg uppercase">{{ $port->code }}</span>
                         </div>
                         <h5 class="font-extrabold text-slate-800 text-sm leading-snug mb-1">{{ $port->name }}</h5>
-                        <div class="flex items-center gap-2 mb-4">
+                        <div class="flex items-center gap-2 mb-2">
                             @if(optional($port->country)->flag)
                                 <img src="{{ $port->country->flag }}" class="w-6 object-cover rounded shadow-sm border border-slate-200" style="height:18px;" alt="">
                             @endif
                             <span class="text-xs text-slate-400 font-semibold">{{ optional($port->country)->name ?? 'N/A' }}</span>
+                        </div>
+                        <div class="mb-4">
+                            @if($port->status === 'Macet/Tertunda')
+                                <span class="inline-flex items-center gap-1 py-0.5 px-2 rounded-full text-[10px] font-extrabold uppercase bg-rose-50 text-rose-600 border border-rose-100/50">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                    Macet/Tertunda
+                                </span>
+                            @elseif($port->status === 'Sibuk')
+                                <span class="inline-flex items-center gap-1 py-0.5 px-2 rounded-full text-[10px] font-extrabold uppercase bg-amber-50 text-amber-600 border border-amber-100/50">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    Sibuk
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 py-0.5 px-2 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    Normal
+                                </span>
+                            @endif
                         </div>
                         <div class="mt-auto pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-center">
                             <div>
@@ -181,6 +238,7 @@
                         <th class="p-4">Nama Pelabuhan</th>
                         <th class="p-4">Kode</th>
                         <th class="p-4">Negara</th>
+                        <th class="p-4 text-center">Status</th>
                         <th class="p-4 text-center">Koordinat</th>
                         <th class="p-4 pr-6 text-center">Aksi Peta</th>
                     </tr>
@@ -210,6 +268,24 @@
                                         <span class="block text-xs text-slate-400 font-bold">{{ optional($port->country)->code ?? '' }}</span>
                                     </div>
                                 </div>
+                            </td>
+                            <td class="p-4 text-center">
+                                @if($port->status === 'Macet/Tertunda')
+                                    <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-extrabold uppercase bg-rose-50 text-rose-600 border border-rose-100/50">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                        Macet
+                                    </span>
+                                @elseif($port->status === 'Sibuk')
+                                    <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-50 text-amber-600 border border-amber-100/50">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Sibuk
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Normal
+                                    </span>
+                                @endif
                             </td>
                             <td class="p-4 text-center">
                                 <span class="text-xs text-slate-400 font-mono">{{ number_format(floatval($port->latitude), 4) }}, {{ number_format(floatval($port->longitude), 4) }}</span>

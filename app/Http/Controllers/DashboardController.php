@@ -34,13 +34,12 @@ class DashboardController extends Controller
     {
         $countries = Country::orderBy('name')->get();
         
-        // Lazy initialize: Calculate initial risk scores for all countries if none exist yet
-        if (RiskScore::count() === 0 && $countries->isNotEmpty()) {
-            foreach ($countries as $c) {
-                $this->apiSync->syncWeatherData($c);
-                $this->apiSync->syncWorldBankData($c);
-                $this->apiSync->syncNews($c);
+        // Recalculate risk scores for all countries to ensure they are real-time
+        foreach ($countries as $c) {
+            try {
                 $this->scoringEngine->calculate($c);
+            } catch (\Exception $e) {
+                logger()->error("Dashboard failed to calculate real-time score for " . $c->name . ": " . $e->getMessage());
             }
         }
 
@@ -136,13 +135,15 @@ class DashboardController extends Controller
             ->with('country')
             ->first();
 
-        // Exchange Rate IDR history for USD/IDR chart
+        // Exchange Rate IDR history for USD/IDR chart (real-time)
         $currencyHistory = ExchangeRate::whereHas('country', function($q) {
             $q->where('code', 'ID');
-        })->orderBy('recorded_at', 'asc')->take(10)->pluck('exchange_rate')->toArray();
+        })->orderBy('recorded_at', 'desc')->take(10)->pluck('exchange_rate')->toArray();
 
         if (empty($currencyHistory)) {
             $currencyHistory = [16350, 16380, 16400, 16390, 16420, 16410, 16415];
+        } else {
+            $currencyHistory = array_reverse($currencyHistory);
         }
 
         // Port map locations

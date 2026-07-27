@@ -34,6 +34,16 @@ class CountryController extends Controller
      */
     public function index()
     {
+        $countries = Country::orderBy('name')->get();
+        
+        foreach ($countries as $country) {
+            try {
+                $this->scoringEngine->calculate($country);
+            } catch (\Exception $e) {
+                logger()->error("Failed to calculate real-time risk score for " . $country->name . ": " . $e->getMessage());
+            }
+        }
+
         $countries = Country::with(['riskScores' => function ($q) {
             $q->orderBy('recorded_at', 'desc');
         }])->orderBy('name')->get();

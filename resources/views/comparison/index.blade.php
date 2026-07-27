@@ -175,7 +175,15 @@
                     <h4 class="font-extrabold text-slate-800 text-sm">Tren Inflasi Historis (%)</h4>
                 </div>
                 <div class="h-56"><canvas id="inflation-compare-chart"></canvas></div>
+        </div>
+
+        <!-- Chart.js Exchange Rate Trend Comparison -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-scale-balanced text-amber-500"></i>
+                <h4 class="font-extrabold text-slate-800 text-sm">Tren Pergerakan Kurs Historis (terhadap USD)</h4>
             </div>
+            <div class="h-64"><canvas id="exchange-compare-chart"></canvas></div>
         </div>
 
         {{-- AI Supply Chain Advisor Section --}}
@@ -339,15 +347,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             ]
         },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { font: { size: 12, weight: 'bold' } } } },
-            scales: {
-                y: { grid: { borderDash: [4,4] }, ticks: { font: { weight: 'bold', size: 11 } } },
-                x: { grid: { display: false }, ticks: { font: { size: 11 } } }
-            }
-        }
     });
+
+    // Exchange Rate Chart Comparison
+    const c1ExHistory = @json($compareData['country1']['exchange_history']);
+    const c2ExHistory = @json($compareData['country2']['exchange_history']);
+
+    if (c1ExHistory.length > 0 && c2ExHistory.length > 0) {
+        const exCtx = document.getElementById('exchange-compare-chart').getContext('2d');
+        const exLabels = c1ExHistory.map(d => {
+            const date = new Date(d.recorded_at);
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        });
+
+        new Chart(exCtx, {
+            type: 'line',
+            data: {
+                labels: exLabels,
+                datasets: [
+                    {
+                        label: '{{ $c1["model"]->name }} ({{ $c1["model"]->currency_code }})',
+                        data: c1ExHistory.map(d => parseFloat(d.exchange_rate)),
+                        borderColor: '#7c3aed',
+                        backgroundColor: 'rgba(124,58,237,0.03)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3
+                    },
+                    {
+                        label: '{{ $c2["model"]->name }} ({{ $c2["model"]->currency_code }})',
+                        data: c2ExHistory.map(d => parseFloat(d.exchange_rate)),
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79,70,229,0.03)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 12, weight: 'bold' } } } },
+                scales: {
+                    y: { grid: { borderDash: [4,4] }, ticks: { font: { weight: 'bold', size: 11 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                }
+            }
+        });
+    }
     @endif
 });
 </script>

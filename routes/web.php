@@ -11,6 +11,7 @@ use App\Http\Controllers\ComparisonController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ShippingEstimatorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -44,6 +45,9 @@ Route::middleware(['auth'])->group(function () {
     // Comparison Engine
     Route::get('/comparison', [ComparisonController::class, 'index'])->name('comparison.index');
 
+    // Shipping Estimator
+    Route::get('/shipping-estimator', [ShippingEstimatorController::class, 'index'])->name('shipping.estimator');
+
     // Watchlist
     Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/watchlist/toggle/{country}', [WatchlistController::class, 'toggle'])->name('watchlist.toggle');
@@ -68,6 +72,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/words', [AdminController::class, 'wordsIndex'])->name('admin.words.index');
     Route::post('/admin/words', [AdminController::class, 'storeWord'])->name('admin.words.store');
     Route::delete('/admin/words/{type}/{word}', [AdminController::class, 'destroyWord'])->name('admin.words.destroy');
+
+    // Fitur AI & Data Science Admin
+    Route::get('/admin/ai-analytics', [AdminController::class, 'aiAnalyticsIndex'])->name('admin.ai.index');
 
     // Profile CRUD
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

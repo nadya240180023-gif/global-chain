@@ -8,6 +8,11 @@ use App\Models\Country;
 use App\Models\PositiveWord;
 use App\Models\NegativeWord;
 use App\Models\Article;
+use App\Models\RiskScore;
+use App\Models\WeatherData;
+use App\Models\NewsCache;
+use App\Services\SentimentAnalyzer;
+use App\Services\RiskScoringEngine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -166,5 +171,88 @@ class AdminController extends Controller
     {
         $article->delete();
         return redirect()->back()->with('success', 'Artikel analisis berhasil dihapus.');
+    }
+
+    public function aiAnalyticsIndex(Request $request, SentimentAnalyzer $analyzer)
+    {
+        $totalCountries = Country::count();
+        $totalPorts = Port::count();
+
+        // Get latest score for each country
+        $latestScores = RiskScore::whereIn('id', function($query) {
+            $query->selectRaw('MAX(id)')
+                ->from('risk_scores')
+                ->groupBy('country_id');
+        })->get();
+
+        $avgRisk = $latestScores->avg('total_score') ?: 0;
+        $avgWeather = $latestScores->avg('weather_score') ?: 0;
+        $avgInflation = $latestScores->avg('inflation_score') ?: 0;
+        $avgCurrency = $latestScores->avg('currency_score') ?: 0;
+        $avgNews = $latestScores->avg('news_score') ?: 0;
+
+        $riskDistribution = [
+            'High' => $latestScores->where('risk_level', 'High')->count(),
+            'Medium' => $latestScores->where('risk_level', 'Medium')->count(),
+            'Low' => $latestScores->where('risk_level', 'Low')->count(),
+        ];
+
+        // Sentiment Playground (Default value provided to display results immediately on first load)
+        $testText = $request->input('sentiment_text', 'Badai besar menyebabkan penundaan kargo dan krisis inflasi.');
+        $sentimentResult = $analyzer->analyze($testText);
+
+        // Predictive Simulator
+        $simResult = null;
+        if ($request->has('sim_weather')) {
+            $sw = intval($request->input('sim_weather'));
+            $si = intval($request->input('sim_inflation'));
+            $sc = intval($request->input('sim_currency'));
+            $sn = intval($request->input('sim_news'));
+
+            $simTotal = round(($sw * 0.20) + ($si * 0.20) + ($sc * 0.20) + ($sn * 0.40));
+            $simLevel = 'Low';
+            if ($simTotal >= 70) {
+                $simLevel = 'High';
+            } elseif ($simTotal >= 35) {
+                $simLevel = 'Medium';
+            }
+
+            $simResult = [
+                'total_score' => $simTotal,
+                'risk_level' => $simLevel,
+                'weather_score' => $sw,
+                'inflation_score' => $si,
+                'currency_score' => $sc,
+                'news_score' => $sn,
+            ];
+        }
+
+        // Global News Sentiment Breakdown
+        $totalNews = NewsCache::count();
+        $posNews = NewsCache::where('sentiment', 'Positive')->count();
+        $negNews = NewsCache::where('sentiment', 'Negative')->count();
+        $neuNews = NewsCache::where('sentiment', 'Neutral')->count();
+
+        $newsBreakdown = [
+            'total' => $totalNews,
+            'Positive' => $totalNews > 0 ? round(($posNews / $totalNews) * 100) : 0,
+            'Negative' => $totalNews > 0 ? round(($negNews / $totalNews) * 100) : 0,
+            'Neutral' => $totalNews > 0 ? round(($neuNews / $totalNews) * 100) : 0,
+        ];
+
+        return view('admin.ai', compact(
+            'totalCountries',
+            'totalPorts',
+            'avgRisk',
+            'avgWeather',
+            'avgInflation',
+            'avgCurrency',
+            'avgNews',
+            'riskDistribution',
+            'testText',
+            'sentimentResult',
+            'simResult',
+            'newsBreakdown'
+        ));
     }
 }

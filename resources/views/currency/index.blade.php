@@ -62,76 +62,76 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         
         {{-- Current Rate --}}
-        <div class="bg-slate-50 rounded-3xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[130px]">
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[135px]">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Kurs Saat Ini (1 USD)</span>
                 <span class="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-sack-dollar text-blue-500 text-sm"></i>
                 </span>
             </div>
-            <div class="mt-2">
+            <div class="mt-3">
                 <div class="text-2xl font-black text-slate-800 truncate">
                     {{ $latestRate ? number_format($latestRate->exchange_rate, 2) : 'N/A' }} 
                     <span class="text-xs font-bold text-slate-400">{{ $selectedCountry?->currency_code }}</span>
                 </div>
-                <div class="text-xs text-slate-400 font-semibold mt-1">
+                <div class="text-[11px] text-slate-400 font-semibold mt-1">
                     Nilai tukar terhadap Dolar AS
                 </div>
             </div>
         </div>
 
         {{-- Volatility Status --}}
-        <div class="bg-slate-50 rounded-3xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[130px]">
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[135px]">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Tingkat Volatilitas</span>
                 <span class="w-8 h-8 bg-purple-50 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-chart-line text-purple-500 text-sm"></i>
                 </span>
             </div>
-            <div class="mt-2">
-                <span class="inline-block px-3 py-1 rounded-lg border text-xs font-bold {{ $volatilityClass }}">
+            <div class="mt-3">
+                <span class="inline-block px-2.5 py-0.5 rounded-lg border text-[10px] font-extrabold {{ $volatilityClass }}">
                     {{ $volatilityStatus }} ({{ number_format($volatility, 2) }}%)
                 </span>
-                <div class="text-xs text-slate-400 font-semibold mt-1.5 leading-snug">
+                <div class="text-[11px] text-slate-400 font-semibold mt-1.5 leading-snug">
                     {{ $volatilityDesc }}
                 </div>
             </div>
         </div>
 
         {{-- Highest Rate (30 days) --}}
-        <div class="bg-slate-50 rounded-3xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[130px]">
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[135px]">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Kurs Tertinggi (30 Hari)</span>
                 <span class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-arrow-trend-up text-emerald-500 text-sm"></i>
                 </span>
             </div>
-            <div class="mt-2">
+            <div class="mt-3">
                 <div class="text-2xl font-black text-slate-800 truncate">
                     {{ $maxRate ? number_format($maxRate, 2) : 'N/A' }} 
                     <span class="text-xs font-bold text-slate-400">{{ $selectedCountry?->currency_code }}</span>
                 </div>
-                <div class="text-xs text-slate-400 font-semibold mt-1">
-                    Nilai tertinggi tercatat dalam sebulan
+                <div class="text-[11px] text-slate-400 font-semibold mt-1">
+                    Nilai tertinggi sebulan terakhir
                 </div>
             </div>
         </div>
 
         {{-- Lowest Rate (30 days) --}}
-        <div class="bg-slate-50 rounded-3xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[130px]">
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[135px]">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Kurs Terendah (30 Hari)</span>
                 <span class="w-8 h-8 bg-rose-50 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-arrow-trend-down text-rose-500 text-sm"></i>
                 </span>
             </div>
-            <div class="mt-2">
+            <div class="mt-3">
                 <div class="text-2xl font-black text-slate-800 truncate">
                     {{ $minRate ? number_format($minRate, 2) : 'N/A' }} 
                     <span class="text-xs font-bold text-slate-400">{{ $selectedCountry?->currency_code }}</span>
                 </div>
-                <div class="text-xs text-slate-400 font-semibold mt-1">
-                    Nilai terendah tercatat dalam sebulan
+                <div class="text-[11px] text-slate-400 font-semibold mt-1">
+                    Nilai terendah sebulan terakhir
                 </div>
             </div>
         </div>
@@ -145,21 +145,21 @@
         <div class="lg:col-span-1 flex flex-col gap-8">
             
             {{-- Selector Card --}}
-            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300">
                 <h3 class="text-base font-extrabold text-slate-800 mb-2">Pilih Negara / Valuta</h3>
                 <p class="text-xs text-slate-400 font-semibold leading-relaxed mb-4">Pilih negara untuk memantau fluktuasi nilai mata uang domestiknya terhadap USD.</p>
                 
                 <form action="{{ route('currency.index') }}" method="GET" class="space-y-4">
                     <div>
                         <div class="relative">
-                            <select id="country-select" name="country" onchange="this.form.submit()" class="bg-slate-100 border border-slate-200 text-slate-800 text-sm font-semibold rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-3 pr-8 appearance-none cursor-pointer transition-all">
+                            <select id="country-select" name="country" onchange="this.form.submit()" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full p-3.5 pr-10 appearance-none cursor-pointer transition-all">
                                 @foreach($countries as $c)
                                     <option value="{{ $c->code }}" {{ ($selectedCountry && $selectedCountry->code === $c->code) ? 'selected' : '' }}>
                                         {{ $c->name }} ({{ $c->currency_code }} - {{ $c->currency }})
                                     </option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                                 <i class="fa-solid fa-chevron-down text-xs"></i>
                             </div>
                         </div>
@@ -167,65 +167,89 @@
                 </form>
 
                 @if($selectedCountry)
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-3">
-                        <img src="{{ $selectedCountry->flag }}" class="w-12 h-8 object-cover rounded-lg shadow-sm border border-slate-200" alt="">
+                    <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-3">
+                        <img src="{{ $selectedCountry->flag }}" class="w-12 h-8 object-cover rounded-xl shadow-sm border border-slate-200" alt="">
                         <div>
                             <h4 class="font-extrabold text-slate-800 leading-none text-sm">{{ $selectedCountry->name }}</h4>
-                            <span class="text-xs text-slate-400 font-semibold mt-1.5 block">Simbol Kurs: {{ $selectedCountry->currency_code }}</span>
+                            <span class="text-xs text-slate-400 font-bold mt-1.5 block">Simbol Kurs: {{ $selectedCountry->currency_code }}</span>
                         </div>
                     </div>
                 @endif
             </div>
 
             {{-- Bidirectional Calculator --}}
-            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex-1 flex flex-col justify-between">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300 flex-1 flex flex-col justify-between">
                 <div>
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <h3 class="text-base font-extrabold text-slate-800">Kalkulator Konversi Dua Arah</h3>
-                        <p class="text-xs text-slate-400 font-semibold mt-1">Konversi mata uang target ke USD atau sebaliknya secara real-time.</p>
+                        <p class="text-xs text-slate-400 font-semibold mt-1">Hitung nilai tukar silang antar valuta dunia secara instan dan akurat.</p>
                     </div>
 
-                    <div class="space-y-4 py-2">
-                        <!-- USD Input -->
-                        <div>
-                            <label for="calc-usd" class="text-xs font-bold text-slate-400 block mb-1.5">Jumlah Dolar (USD)</label>
-                            <div class="relative rounded-xl shadow-sm">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span class="text-slate-400 text-sm font-bold">$</span>
+                    <div class="space-y-4 py-2 relative">
+                        <!-- Currency A -->
+                        <div class="bg-slate-50/60 border border-slate-100 rounded-2xl p-4">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 font-mono">Dari Mata Uang</label>
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1">
+                                    <select id="calc-select-a" class="bg-white border border-slate-200 text-slate-700 text-xs font-extrabold rounded-xl block w-full p-2.5 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                        <option value="USD">USD - United States Dollar</option>
+                                        @foreach($countries as $c)
+                                            <option value="{{ $c->code }}" {{ ($selectedCountry && $selectedCountry->code === $c->code) ? 'selected' : '' }}>
+                                                {{ $c->code }} - {{ $c->currency_code }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <input type="number" id="calc-usd" class="block w-full rounded-xl border border-slate-200 pl-7 pr-3 py-2.5 focus:border-blue-500 focus:ring-blue-500 text-sm font-bold text-slate-800" placeholder="0.00" value="100">
+                                <div class="w-32 relative shadow-sm rounded-xl">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <span id="calc-symbol-a" class="text-slate-400 text-[10px] font-black">USD</span>
+                                    </div>
+                                    <input type="number" id="calc-val-a" class="block w-full rounded-xl border border-slate-200 pl-11 pr-2 py-2.5 focus:border-blue-500 focus:ring-blue-500 text-xs font-black text-slate-700 shadow-sm" placeholder="0.00" value="100">
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Intercept Swap Icon -->
-                        <div class="flex items-center justify-center text-slate-400">
-                            <i class="fa-solid fa-arrow-up-down text-base"></i>
+                        <!-- Premium Floating Swap Button -->
+                        <div class="flex justify-center -my-3.5 relative z-10">
+                            <button id="calc-swap-btn" type="button" class="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-md hover:shadow-lg flex items-center justify-center text-slate-500 hover:text-blue-600 transition-all cursor-pointer">
+                                <i class="fa-solid fa-arrow-up-down text-xs"></i>
+                            </button>
                         </div>
 
-                        <!-- Target Currency Input -->
-                        <div>
-                            <label for="calc-target" class="text-xs font-bold text-slate-400 block mb-1.5">
-                                Jumlah ({{ $selectedCountry ? $selectedCountry->currency_code : 'Target' }})
-                            </label>
-                            <div class="relative rounded-xl shadow-sm">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span class="text-slate-400 text-sm font-bold">{{ $selectedCountry ? $selectedCountry->currency_code : '' }}</span>
+                        <!-- Currency B -->
+                        <div class="bg-slate-50/60 border border-slate-100 rounded-2xl p-4">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 font-mono">Ke Mata Uang</label>
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1">
+                                    <select id="calc-select-b" class="bg-white border border-slate-200 text-slate-700 text-xs font-extrabold rounded-xl block w-full p-2.5 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                        <option value="USD">USD - United States Dollar</option>
+                                        @foreach($countries as $c)
+                                            <option value="{{ $c->code }}" {{ ($selectedCountry && $selectedCountry->code !== $c->code && $c->code === 'DE') ? 'selected' : '' }}>
+                                                {{ $c->code }} - {{ $c->currency_code }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <input type="number" id="calc-target" class="block w-full rounded-xl border border-slate-200 pl-14 pr-3 py-2.5 focus:border-blue-500 focus:ring-blue-500 text-sm font-bold text-slate-800" placeholder="0.00">
+                                <div class="w-32 relative shadow-sm rounded-xl">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <span id="calc-symbol-b" class="text-slate-400 text-[10px] font-black">EUR</span>
+                                    </div>
+                                    <input type="number" id="calc-val-b" class="block w-full rounded-xl border border-slate-200 pl-11 pr-2 py-2.5 focus:border-blue-500 focus:ring-blue-500 text-xs font-black text-slate-700 shadow-sm" placeholder="0.00">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-xs text-slate-400 font-semibold border-t border-slate-100 pt-3 mt-4">
-                    Kalkulasi berdasarkan kurs terkahir (1 USD = {{ $latestRate ? number_format($latestRate->exchange_rate, 4) : 'N/A' }} {{ $selectedCountry?->currency_code }}).
+                <div class="text-[10px] text-slate-400 font-bold border-t border-slate-100 pt-3 mt-4 leading-relaxed">
+                    Kalkulasi nilai kurs silang dilakukan secara real-time berdasarkan kurs acuan USD yang terdaftar di database.
                 </div>
             </div>
 
         </div>
 
         {{-- Right Column: Trend Chart (Takes 2/3 width) --}}
-        <div class="lg:col-span-2 bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.01)] flex flex-col justify-between">
+        <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between">
             <div class="border-b border-slate-100 pb-3 mb-4">
                 <h3 class="text-base font-extrabold text-slate-800">Tren Pergerakan Kurs (30 Hari Terakhir)</h3>
                 <p class="text-xs text-slate-400 font-semibold mt-1">Grafik historis nilai tukar mata uang domestik per 1 Dolar AS.</p>
@@ -238,7 +262,7 @@
     </div>
 
     {{-- ══ LOG HISTORIS TABLE CARD ══ --}}
-    <div class="bg-slate-50 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] overflow-hidden">
+    <div class="bg-white rounded-3xl border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300 overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex items-center justify-between">
             <div>
                 <h3 class="text-base font-extrabold text-slate-800">Log Riwayat Kurs</h3>
@@ -248,7 +272,7 @@
         
         <div class="overflow-x-auto">
             @if($rateHistory->isEmpty())
-                <div class="text-center py-20">
+                <div class="text-center py-20 bg-white">
                     <div class="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
                         <i class="fa-solid fa-money-bill-transfer text-slate-600 text-3xl"></i>
                     </div>
@@ -257,16 +281,16 @@
             @else
                 <table class="w-full">
                     <thead>
-                        <tr class="bg-slate-800 text-left">
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Waktu Sinkronisasi</th>
-                            <th class="px-4 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Mata Uang Acuan</th>
-                            <th class="px-4 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Mata Uang Tujuan</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-right">Nilai Kurs Akhir</th>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-left">
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Waktu Sinkronisasi</th>
+                            <th class="px-4 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Mata Uang Acuan</th>
+                            <th class="px-4 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Mata Uang Tujuan</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Nilai Kurs Akhir</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 bg-white">
                         @foreach($rateHistory->reverse() as $rate)
-                            <tr class="hover:bg-slate-100/70 transition-colors duration-150">
+                            <tr class="hover:bg-slate-50/80 transition-colors duration-150">
                                 <td class="px-6 py-4 font-semibold text-slate-700 text-sm">
                                     {{ \Carbon\Carbon::parse($rate->recorded_at)->format('d M Y, H:i') }}
                                 </td>
@@ -291,26 +315,69 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const rate = {{ $latestRate ? $latestRate->exchange_rate : 1.0 }};
-        const usdInput = document.getElementById('calc-usd');
-        const targetInput = document.getElementById('calc-target');
+        const ratesMap = {
+            'USD': { code: 'USD', rate: 1.0, symbol: '$' },
+            @foreach($countries as $c)
+                @php
+                    $latest = \App\Models\ExchangeRate::where('country_id', $c->id)->orderBy('recorded_at', 'desc')->first();
+                @endphp
+                '{{ $c->code }}': {
+                    code: '{{ $c->currency_code }}',
+                    rate: {{ $latest ? $latest->exchange_rate : 1.0 }},
+                    symbol: '{{ $c->currency_code }}'
+                },
+            @endforeach
+        };
 
-        // Bidirectional Conversion logic
-        function convertUsdToTarget() {
-            const usdVal = parseFloat(usdInput.value) || 0;
-            targetInput.value = (usdVal * rate).toFixed(2);
+        const selectA = document.getElementById('calc-select-a');
+        const selectB = document.getElementById('calc-select-b');
+        const valA = document.getElementById('calc-val-a');
+        const valB = document.getElementById('calc-val-b');
+        const symbolA = document.getElementById('calc-symbol-a');
+        const symbolB = document.getElementById('calc-symbol-b');
+        const swapBtn = document.getElementById('calc-swap-btn');
+
+        function updateConversion(source) {
+            const countryA = selectA.value;
+            const countryB = selectB.value;
+
+            const dataA = ratesMap[countryA] || { code: 'USD', rate: 1.0, symbol: 'USD' };
+            const dataB = ratesMap[countryB] || { code: 'USD', rate: 1.0, symbol: 'USD' };
+
+            symbolA.textContent = dataA.code;
+            symbolB.textContent = dataB.code;
+
+            const rateA = dataA.rate;
+            const rateB = dataB.rate;
+
+            if (source === 'A') {
+                const amountA = parseFloat(valA.value) || 0;
+                valB.value = (amountA * (rateB / rateA)).toFixed(4);
+            } else {
+                const amountB = parseFloat(valB.value) || 0;
+                valA.value = (amountB * (rateA / rateB)).toFixed(4);
+            }
         }
 
-        function convertTargetToUsd() {
-            const targetVal = parseFloat(targetInput.value) || 0;
-            usdInput.value = (targetVal / rate).toFixed(2);
-        }
+        selectA.addEventListener('change', () => updateConversion('A'));
+        selectB.addEventListener('change', () => updateConversion('A'));
+        valA.addEventListener('input', () => updateConversion('A'));
+        valB.addEventListener('input', () => updateConversion('B'));
 
-        usdInput.addEventListener('input', convertUsdToTarget);
-        targetInput.addEventListener('input', convertTargetToUsd);
+        swapBtn.addEventListener('click', () => {
+            const tempCode = selectA.value;
+            selectA.value = selectB.value;
+            selectB.value = tempCode;
 
-        // Run once on load
-        convertUsdToTarget();
+            const tempVal = valA.value;
+            valA.value = valB.value;
+            valB.value = tempVal;
+
+            updateConversion('A');
+        });
+
+        // Initialize once
+        updateConversion('A');
 
         // Chart.js Configuration
         const chartHistory = @json($rateHistory);

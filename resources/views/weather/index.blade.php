@@ -8,9 +8,8 @@
     $validWeathers = collect($allCountriesWeather)->filter(fn($w) => !is_null($w['temperature']));
     $latestWeather = $weatherHistory->first();
 
-    // Mock risk score for UI
-    $riskScore = 20;
-    $riskStatus = 'Tingkat Sedang';
+    $riskScore = $latestScore ? $latestScore->weather_score : 20;
+    $riskStatus = $riskScore >= 70 ? 'Tingkat Tinggi' : ($riskScore >= 35 ? 'Tingkat Sedang' : 'Tingkat Rendah');
 @endphp
 
 <style>
@@ -271,8 +270,8 @@
         <!-- Card 5 -->
         <div class="gold-accent weather-card relative">
             <span class="text-xs font-black tracking-widest text-slate-600 mb-6 uppercase">Status Badai</span>
-            <div class="text-2xl font-black text-emerald-600 mb-6 leading-none mt-2">{{ $stormStatus }}</div>
-            <span class="text-sm text-emerald-600 font-bold flex items-center gap-1">
+            <div class="text-2xl font-black {{ $isStorm ? 'text-rose-600' : 'text-emerald-600' }} mb-6 leading-none mt-2">{{ $stormStatus }}</div>
+            <span class="text-sm {{ $isStorm ? 'text-rose-600' : 'text-emerald-600' }} font-bold flex items-center gap-1">
                 {{ $stormDesc }}
             </span>
             <div class="absolute right-3 bottom-1/3 opacity-40">
@@ -283,16 +282,20 @@
             </div>
         </div>
         <!-- Card 6 -->
+        @php
+            $riskColor = $riskScore >= 70 ? 'text-rose-500' : ($riskScore >= 35 ? 'text-amber-500' : 'text-emerald-600');
+            $shieldColor = $riskScore >= 70 ? 'text-rose-400' : ($riskScore >= 35 ? 'text-amber-400' : 'text-emerald-400');
+        @endphp
         <div class="gold-accent weather-card relative">
             <span class="text-xs font-black tracking-widest text-slate-600 mb-4 uppercase">Risiko Cuaca</span>
             <div class="flex items-baseline justify-center gap-1 mb-6">
-                <span class="text-[40px] font-black text-[#8b5a2b] leading-none">20</span>
+                <span class="text-[40px] font-black {{ $riskColor }} leading-none">{{ $riskScore }}</span>
                 <span class="text-3xl font-black text-slate-300">/</span>
-                <span class="text-3xl font-black text-[#8b5a2b]">30</span>
+                <span class="text-2xl font-bold {{ $riskColor }}">100</span>
             </div>
-            <span class="text-sm text-[#8b5a2b] font-bold">Tingkat Sedang</span>
+            <span class="text-sm {{ $riskColor }} font-bold">{{ $riskStatus }}</span>
             <div class="absolute right-3 bottom-1/3 opacity-40">
-                <i class="fa-solid fa-shield-exclamation text-[#d4af37] text-3xl"></i>
+                <i class="fa-solid fa-shield-exclamation {{ $shieldColor }} text-3xl"></i>
             </div>
         </div>
     </div>
@@ -424,9 +427,15 @@
 
                 // Add Popup with specific style matching image
                 const temp = c.temperature !== null ? c.temperature + ' °C' : 'N/A';
+                const humidity = c.humidity !== null ? c.humidity + ' %' : 'N/A';
                 const rain = c.rainfall !== null ? c.rainfall + ' mm' : 'N/A';
                 const wind = c.wind_speed !== null ? c.wind_speed + ' km/h' : 'N/A';
                 const condition = c.condition !== null ? c.condition : 'N/A';
+
+                const rainStatus = c.rainfall > 0 ? 'Ya' : 'Tidak';
+                const windLabel = c.wind_speed > 25 ? 'Kencang' : 'Normal';
+                const isStorm = (c.condition && c.condition.toLowerCase().includes('storm')) || c.wind_speed > 30 || c.rainfall > 15;
+                const stormStatus = isStorm ? 'Ya (Bahaya)' : 'Tidak (Aman)';
 
                 const popupContent = `
                     <div style="font-family:'Outfit',sans-serif; min-width: 220px; padding: 4px;">
@@ -441,19 +450,19 @@
                             </div>
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <span style="width:12px; height:12px; background-color:#3b82f6; border-radius:50%; display:inline-block;"></span>
-                                <b>Kelembapan:</b> 68 %
+                                <b>Kelembapan:</b> ${humidity}
                             </div>
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <span style="width:12px; height:12px; background-color:#10b981; border-radius:50%; display:inline-block;"></span>
-                                <b>Kec. Angin:</b> ${wind} (Kencang)
+                                <b>Kec. Angin:</b> ${wind} (${windLabel})
                             </div>
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <i class="fa-solid fa-cloud-rain" style="color:#a855f7; width:12px; text-align:center;"></i>
-                                <b>Hujan:</b> ${rain} (Ya)
+                                <b>Hujan:</b> ${rain} (${rainStatus})
                             </div>
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <i class="fa-solid fa-cloud-bolt" style="color:#312e81; width:12px; text-align:center;"></i>
-                                <b>Badai:</b> Tidak
+                                <b>Badai:</b> ${stormStatus}
                             </div>
                         </div>
                     </div>

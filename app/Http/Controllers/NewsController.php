@@ -25,17 +25,12 @@ class NewsController extends Controller
         $selectedCountry = Country::where('code', strtoupper($selectedCode))->first();
 
         if ($selectedCountry) {
-            // Check if we need to sync news (if empty or older than 15 minutes to keep it real-time but respect API limits)
-            $latestNews = \App\Models\NewsCache::where('country_id', $selectedCountry->id)
-                            ->orderBy('created_at', 'desc')
-                            ->first();
-
-            $needsSync = !$latestNews || $latestNews->created_at->diffInMinutes(Carbon::now()) >= 15;
-
-            if ($needsSync) {
-                // Clear old news for this country
+            // Clear old news for this country and sync new one to keep it fully real-time
+            try {
                 \App\Models\NewsCache::where('country_id', $selectedCountry->id)->delete();
                 $this->fetchGNews($selectedCountry);
+            } catch (\Exception $e) {
+                logger()->error("Failed to sync news real-time for " . $selectedCountry->name . ": " . $e->getMessage());
             }
         } // Fetch news for selected country
         $news = $selectedCountry

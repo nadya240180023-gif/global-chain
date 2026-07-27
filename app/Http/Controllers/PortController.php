@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Port;
 use App\Models\Country;
+use App\Services\ApiSyncService;
 use Illuminate\Http\Request;
 
 class PortController extends Controller
 {
+    protected $apiSync;
+
+    public function __construct(ApiSyncService $apiSync)
+    {
+        $this->apiSync = $apiSync;
+    }
+
     public function index(Request $request)
     {
         $search    = $request->query('search');
@@ -29,6 +37,74 @@ class PortController extends Controller
         $ports     = $query->get();
         $countries = Country::orderBy('name')->get();
 
+        // Recalculate risk scores in real-time on load
+        $engine = new \App\Services\RiskScoringEngine();
+        foreach ($countries as $c) {
+            try {
+                $engine->calculate($c);
+            } catch (\Exception $e) {
+                logger()->error("PortController failed to calculate real-time score for " . $c->name . ": " . $e->getMessage());
+            }
+        }
+
+        // Sync weather data for all countries that have ports to ensure weather parameters (wind, rain, storm) are 100% real-time
+        $portCountries = Country::whereHas('ports')->get();
+        foreach ($portCountries as $pc) {
+            try {
+                $this->apiSync->syncWeatherData($pc);
+            } catch (\Exception $e) {
+                logger()->error("PortController failed to sync weather real-time for " . $pc->name . ": " . $e->getMessage());
+            }
+        }
+
+        // Calculate dynamic port statuses
+        $totalPorts = $ports->count();
+        $congestedPorts = 0;
+        $busyPorts = 0;
+        $normalPorts = 0;
+
+        foreach ($ports as $port) {
+            $country = $port->country;
+            $isCongested = false;
+            $isBusy = false;
+
+            if ($country) {
+                $weather = \App\Models\WeatherData::where('country_id', $country->id)->orderBy('recorded_at', 'desc')->first();
+                $risk = \App\Models\RiskScore::where('country_id', $country->id)->orderBy('recorded_at', 'desc')->first();
+
+                if ($weather) {
+                    $cond = strtolower($weather->weather_condition);
+                    if (str_contains($cond, 'storm') || str_contains($cond, 'thunderstorm') || $weather->wind_speed > 25) {
+                        $isCongested = true;
+                    } elseif (str_contains($cond, 'rain') || $weather->wind_speed > 15) {
+                        $isBusy = true;
+                    }
+                }
+
+                if ($risk) {
+                    if ($risk->total_score >= 70) {
+                        $isCongested = true;
+                    } elseif ($risk->total_score >= 35) {
+                        $isBusy = true;
+                    }
+                }
+            }
+
+            if ($isCongested) {
+                $congestedPorts++;
+                $port->status = 'Macet/Tertunda';
+                $port->status_color = 'rose';
+            } elseif ($isBusy) {
+                $busyPorts++;
+                $port->status = 'Sibuk';
+                $port->status_color = 'amber';
+            } else {
+                $normalPorts++;
+                $port->status = 'Normal';
+                $port->status_color = 'emerald';
+            }
+        }
+
         // ── DB ports for table / cards ──
         $mapPorts = $ports->map(function ($p) {
             return [
@@ -39,6 +115,8 @@ class PortController extends Controller
                 'country_name' => optional($p->country)->name ?? '',
                 'country_code' => optional($p->country)->code ?? '',
                 'region'       => $this->getRegionByCode(optional($p->country)->code ?? ''),
+                'status'       => $p->status,
+                'status_color' => $p->status_color,
                 'type'         => 'database',
             ];
         })->values()->toArray();
@@ -49,7 +127,7 @@ class PortController extends Controller
         $supplemental = array_values(array_filter($globalData, fn($p) => !in_array($p['code'], $dbCodes)));
         $allMapPorts = array_merge($mapPorts, $supplemental);
 
-        return view('ports.index', compact('ports', 'countries', 'mapPorts', 'allMapPorts', 'search', 'countryId'));
+        return view('ports.index', compact('ports', 'countries', 'mapPorts', 'allMapPorts', 'search', 'countryId', 'totalPorts', 'congestedPorts', 'busyPorts', 'normalPorts'));
     }
 
     public function worldMap(Request $request)

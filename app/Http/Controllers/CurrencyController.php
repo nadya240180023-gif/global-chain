@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\ExchangeRate;
+use App\Services\ApiSyncService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class CurrencyController extends Controller
 {
+    protected $apiSync;
+
+    public function __construct(ApiSyncService $apiSync)
+    {
+        $this->apiSync = $apiSync;
+    }
+
     public function index(Request $request)
     {
         $countries = Country::whereNotNull('currency_code')->orderBy('name')->get();
@@ -19,8 +27,20 @@ class CurrencyController extends Controller
             $selectedCountry = $countries->first();
         }
 
-        // If no rates exist for this country, seed realistic dummy data (no API call)
-        if ($selectedCountry && !$selectedCountry->exchangeRates()->exists()) {
+        if ($selectedCountry) {
+            // Delete old exchange rates for the selected country to ensure fresh, real-world API data
+            ExchangeRate::where('country_id', $selectedCountry->id)->delete();
+        }
+
+        // Trigger real-time sync of all exchange rates from open.er-api.com on load
+        try {
+            $this->apiSync->syncExchangeRates();
+        } catch (\Exception $e) {
+            logger()->error("Failed to sync exchange rates real-time: " . $e->getMessage());
+        }
+
+        // Seed the 29-day history centered around the real-world rate
+        if ($selectedCountry) {
             $this->seedDummyRates($selectedCountry);
         }
 
@@ -32,9 +52,11 @@ class CurrencyController extends Controller
 
         $rateHistory = $selectedCountry
             ? ExchangeRate::where('country_id', $selectedCountry->id)
-                ->orderBy('recorded_at', 'asc')
+                ->orderBy('recorded_at', 'desc')
                 ->take(30)
                 ->get()
+                ->reverse()
+                ->values()
             : collect();
 
         return view('currency.index', compact('countries', 'selectedCountry', 'latestRate', 'rateHistory'));
@@ -45,20 +67,17 @@ class CurrencyController extends Controller
      */
     private function seedDummyRates(Country $country): void
     {
-        // Default base rates for common currency codes (per 1 USD)
-        $baseRates = [
-            'IDR' => 16300, 'MYR' => 4.72, 'SGD' => 1.35, 'THB' => 35.2,
-            'PHP' => 57.8,  'VND' => 25400, 'JPY' => 149.5, 'CNY' => 7.24,
-            'KRW' => 1330,  'INR' => 83.5, 'AUD' => 1.54, 'EUR' => 0.92,
-            'GBP' => 0.79,  'BRL' => 4.97, 'MXN' => 17.1, 'ZAR' => 18.6,
-            'AED' => 3.67,  'SAR' => 3.75, 'TRY' => 32.1, 'EGP' => 47.5,
-        ];
-
         $code = strtoupper($country->currency_code);
-        $baseRate = $baseRates[$code] ?? 1.0;
+        
+        // Find the latest rate synced from open.er-api.com
+        $latest = ExchangeRate::where('country_id', $country->id)
+            ->orderBy('recorded_at', 'desc')
+            ->first();
 
-        // Generate 30 days of realistic-looking data with small variance
-        for ($i = 29; $i >= 0; $i--) {
+        $baseRate = $latest ? floatval($latest->exchange_rate) : 1.0;
+
+        // Generate 29 days of realistic-looking historical data based on this real rate
+        for ($i = 29; $i >= 1; $i--) {
             $variance = $baseRate * 0.008; // 0.8% daily variance
             $rate = $baseRate + (mt_rand(-100, 100) / 100) * $variance;
 

@@ -33,16 +33,20 @@ class SentimentAnalyzer
         $words = preg_split('/\s+/', $cleanText, -1, PREG_SPLIT_NO_EMPTY);
 
         // Fetch words from DB
-        $positiveLexicon = PositiveWord::pluck('word')->map('strtolower')->toArray();
-        $negativeLexicon = NegativeWord::pluck('word')->map('strtolower')->toArray();
+        $dbPos = PositiveWord::pluck('word')->map('strtolower')->toArray();
+        $dbNeg = NegativeWord::pluck('word')->map('strtolower')->toArray();
 
-        // Default list if database is not populated yet
-        if (empty($positiveLexicon)) {
-            $positiveLexicon = ['pertumbuhan', 'stabil', 'pemulihan', 'keuntungan', 'solid', 'sukses', 'optimis', 'meningkat', 'efisiensi', 'kerjasama'];
-        }
-        if (empty($negativeLexicon)) {
-            $negativeLexicon = ['krisis', 'memburuk', 'resesi', 'lemah', 'penurunan', 'kepadatan', 'penundaan', 'penumpukan', 'mogok', 'bencana', 'badai', 'peringatan', 'konflik', 'sanksi', 'risiko'];
-        }
+        $defaultPos = [
+            'pertumbuhan', 'stabil', 'pemulihan', 'keuntungan', 'solid', 'sukses', 'optimis', 'meningkat', 'efisiensi', 'kerjasama',
+            'growth', 'stable', 'recovery', 'gain', 'profit', 'solid', 'success', 'optimistic', 'increase', 'efficiency', 'cooperation', 'positive', 'boost', 'improve', 'rise'
+        ];
+        $defaultNeg = [
+            'krisis', 'memburuk', 'resesi', 'lemah', 'penurunan', 'kepadatan', 'penundaan', 'penumpukan', 'mogok', 'bencana', 'badai', 'peringatan', 'konflik', 'sanksi', 'risiko',
+            'crisis', 'worsen', 'recession', 'weak', 'decline', 'congestion', 'delay', 'strike', 'disaster', 'storm', 'warning', 'conflict', 'sanction', 'risk', 'negative', 'drop', 'loss', 'fail', 'hit', 'worry'
+        ];
+
+        $positiveLexicon = array_unique(array_merge($dbPos, $defaultPos));
+        $negativeLexicon = array_unique(array_merge($dbNeg, $defaultNeg));
 
         $posMatches = [];
         $negMatches = [];

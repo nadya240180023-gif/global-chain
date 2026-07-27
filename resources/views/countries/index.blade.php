@@ -130,17 +130,23 @@
             </div>
         </div>
 
-        {{-- Not Assessed --}}
+        {{-- Risk Coverage --}}
+        @php
+            $assessedCount = $countries->count() - $unassessed;
+            $coveragePct = $countries->count() > 0 ? round(($assessedCount / $countries->count()) * 100) : 0;
+        @endphp
         <div class="bg-slate-50 rounded-3xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[130px]">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Not Assessed</span>
-                <span class="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center">
-                    <i class="fa-regular fa-clock text-slate-400 text-sm"></i>
+                <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Cakupan Risiko</span>
+                <span class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i>
                 </span>
             </div>
             <div>
-                <div class="text-4xl font-black text-slate-400">{{ $unassessed }}</div>
-                <div class="text-xs font-medium text-slate-400 mt-2">Awaiting sync</div>
+                <div class="text-4xl font-black text-slate-800">{{ $coveragePct }}%</div>
+                <div class="text-xs font-semibold text-slate-400 mt-2">
+                    {{ $assessedCount }}/{{ $countries->count() }} Terpantau
+                </div>
             </div>
         </div>
     </div>

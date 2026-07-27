@@ -37,9 +37,17 @@ class WeatherController extends Controller
         }
 
         if ($selectedCountry) {
-            // Check if weather exists, if not sync
-            if (!$selectedCountry->weatherData()->exists()) {
-                $this->apiSync->syncWeatherData($selectedCountry);
+            // Always sync weather on load for the selected country and all countries with ports to keep the global weather map real-time
+            $countriesToSync = Country::whereHas('ports')
+                ->orWhere('id', $selectedCountry->id)
+                ->get();
+
+            foreach ($countriesToSync as $c) {
+                try {
+                    $this->apiSync->syncWeatherData($c);
+                } catch (\Exception $e) {
+                    logger()->error("Failed to sync weather real-time for " . $c->name . ": " . $e->getMessage());
+                }
             }
         }
 
@@ -66,12 +74,19 @@ class WeatherController extends Controller
                     'latitude' => floatval($c->latitude),
                     'longitude' => floatval($c->longitude),
                     'temperature' => $latest ? floatval($latest->temperature) : null,
+                    'humidity' => $latest ? floatval($latest->humidity) : null,
                     'rainfall' => $latest ? floatval($latest->rainfall) : null,
                     'wind_speed' => $latest ? floatval($latest->wind_speed) : null,
                     'condition' => $latest ? $latest->weather_condition : 'Unknown',
                 ];
             });
 
-        return view('weather.index', compact('countries', 'selectedCountry', 'weatherHistory', 'allCountriesWeather'));
+        $latestScore = $selectedCountry 
+            ? \App\Models\RiskScore::where('country_id', $selectedCountry->id)
+                ->orderBy('recorded_at', 'desc')
+                ->first()
+            : null;
+
+        return view('weather.index', compact('countries', 'selectedCountry', 'weatherHistory', 'allCountriesWeather', 'latestScore'));
     }
 }
