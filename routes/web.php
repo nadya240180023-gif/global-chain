@@ -14,6 +14,12 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ShippingEstimatorController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/setup-db', function () {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    return 'Database migrated and seeded successfully! You can now login.';
+});
+
 Route::get('/', function () {
     return redirect('/dashboard');
 });
