@@ -54,6 +54,22 @@
             <form action="{{ route('admin.ports.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1.5 uppercase tracking-wider">Pilih Template Pelabuhan Populer (Opsional)</label>
+                    <select id="port-template" class="w-full border border-slate-200 bg-slate-50/50 rounded-xl text-sm p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer font-bold text-slate-700">
+                        <option value="">-- Pilih Template --</option>
+                        <option value="sg-sin" data-name="Port of Singapore" data-code="SG SIN" data-country="Singapore" data-lat="1.2640" data-lng="103.8400">Port of Singapore (Singapura)</option>
+                        <option value="cn-sha" data-name="Port of Shanghai" data-code="CN SHA" data-country="China" data-lat="31.2222" data-lng="121.5033">Port of Shanghai (Tiongkok)</option>
+                        <option value="nl-rtm" data-name="Port of Rotterdam" data-code="NL RTM" data-country="Netherlands" data-lat="51.9500" data-lng="4.0500">Port of Rotterdam (Belanda)</option>
+                        <option value="id-tpp" data-name="Port of Tanjung Priok (Jakarta)" data-code="ID TPP" data-country="Indonesia" data-lat="-6.1000" data-lng="106.8833">Port of Tanjung Priok (Indonesia)</option>
+                        <option value="us-lax" data-name="Port of Los Angeles" data-code="US LAX" data-country="United States" data-lat="33.7288" data-lng="-118.2620">Port of Los Angeles (Amerika Serikat)</option>
+                        <option value="my-pkg" data-name="Port Klang" data-code="MY PKG" data-country="Malaysia" data-lat="3.0000" data-lng="101.4000">Port Klang (Malaysia)</option>
+                        <option value="de-ham" data-name="Port of Hamburg" data-code="DE HAM" data-country="Germany" data-lat="53.5333" data-lng="9.9667">Port of Hamburg (Jerman)</option>
+                        <option value="ae-jea" data-name="Port of Jebel Ali (Dubai)" data-code="AE JEA" data-country="United Arab Emirates" data-lat="24.9857" data-lng="55.0273">Port of Jebel Ali (Uni Emirat Arab)</option>
+                        <option value="gb-fxt" data-name="Port of Felixstowe" data-code="GB FXT" data-country="United Kingdom" data-lat="51.9500" data-lng="1.3167">Port of Felixstowe (Inggris)</option>
+                        <option value="au-mel" data-name="Port of Melbourne" data-code="AU MEL" data-country="Australia" data-lat="-37.8167" data-lng="144.9167">Port of Melbourne (Australia)</option>
+                    </select>
+                </div>
+                <div>
                     <label class="text-xs font-bold text-slate-500 block mb-1.5 uppercase tracking-wider">Nama Pelabuhan *</label>
                     <input type="text" name="name" required placeholder="Contoh: Port of Rotterdam" class="w-full border border-slate-200 bg-slate-50/50 rounded-xl text-sm p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-bold text-slate-700">
                 </div>
@@ -203,6 +219,75 @@
                 });
             }
         });
+
+        // Template Auto-populate Handler
+        const portTemplateSelect = document.getElementById('port-template');
+        const nameInput = document.querySelector('input[name="name"]');
+        const codeInput = document.querySelector('input[name="code"]');
+        const countrySelect = document.querySelector('select[name="country_id"]');
+
+        if (portTemplateSelect) {
+            portTemplateSelect.addEventListener('change', function() {
+                const selectedOpt = this.options[this.selectedIndex];
+                if (!selectedOpt.value) return;
+
+                const name = selectedOpt.getAttribute('data-name');
+                const code = selectedOpt.getAttribute('data-code');
+                const countryName = selectedOpt.getAttribute('data-country');
+                const lat = selectedOpt.getAttribute('data-lat');
+                const lng = selectedOpt.getAttribute('data-lng');
+
+                if (name) nameInput.value = name;
+                if (code) codeInput.value = code;
+                if (lat) latInput.value = lat;
+                if (lng) lngInput.value = lng;
+
+                // Auto-select Country
+                if (countryName && countrySelect) {
+                    for (let i = 0; i < countrySelect.options.length; i++) {
+                        const opt = countrySelect.options[i];
+                        if (opt.text.toLowerCase().includes(countryName.toLowerCase())) {
+                            countrySelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                // Place or move map marker & center map
+                if (lat && lng) {
+                    const latlng = L.latLng(parseFloat(lat), parseFloat(lng));
+                    map.setView(latlng, 6);
+
+                    const redIcon = L.divIcon({
+                        className: '',
+                        html: '<div class="relative flex items-center justify-center">' +
+                              '<span class="animate-ping absolute inline-flex h-7 w-7 rounded-full bg-rose-400 opacity-75"></span>' +
+                              '<div style="width: 26px; height: 26px;" class="relative bg-rose-600 border border-white flex items-center justify-center rounded-full text-white shadow-lg cursor-grab active:cursor-grabbing"><i class="fa-solid fa-location-crosshairs text-[10px]"></i></div>' +
+                              '</div>',
+                        iconSize: [26, 26],
+                        iconAnchor: [13, 13]
+                    });
+
+                    if (tempMarker) {
+                        tempMarker.setLatLng(latlng);
+                        tempMarker.setPopupContent("<div class='font-bold text-xs p-1'>Titik Baru Pelabuhan<br><span class='font-mono font-normal text-[10px] text-slate-500'>" + lat + ", " + lng + "</span></div>");
+                    } else {
+                        tempMarker = L.marker(latlng, { icon: redIcon, draggable: true })
+                            .addTo(map)
+                            .bindPopup("<div class='font-bold text-xs p-1'>Titik Baru Pelabuhan<br><span class='font-mono font-normal text-[10px] text-slate-500'>" + lat + ", " + lng + "</span></div>");
+                        
+                        tempMarker.on('dragend', function(event) {
+                            const marker = event.target;
+                            const position = marker.getLatLng();
+                            latInput.value = position.lat.toFixed(6);
+                            lngInput.value = position.lng.toFixed(6);
+                            marker.setPopupContent("<div class='font-bold text-xs p-1'>Titik Baru Pelabuhan<br><span class='font-mono font-normal text-[10px] text-slate-500'>" + position.lat.toFixed(6) + ", " + position.lng.toFixed(6) + "</span></div>").openPopup();
+                        });
+                    }
+                    tempMarker.openPopup();
+                }
+            });
+        }
     });
 </script>
 @endsection
