@@ -235,11 +235,14 @@
                                 };
 
                                 $pop = $country->population;
-                                $popLabel = $pop >= 1e9
-                                    ? number_format($pop / 1e9, 2) . ' B'
-                                    : ($pop >= 1e6
-                                        ? number_format($pop / 1e6, 1) . ' M'
-                                        : number_format($pop));
+                                $popLabel = 'N/A';
+                                if ($pop) {
+                                    $popLabel = $pop >= 1e9
+                                        ? number_format($pop / 1e9, 2) . ' B'
+                                        : ($pop >= 1e6
+                                            ? number_format($pop / 1e6, 1) . ' M'
+                                            : number_format($pop));
+                                }
                                 $popPct = min(round($pop / 1500000000 * 100), 100);
 
                                 $riskCfg = match($level) {

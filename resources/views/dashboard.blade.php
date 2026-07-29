@@ -452,13 +452,13 @@
                             <div class="flex items-center justify-between text-sm font-semibold py-0.5">
                                 <span class="text-slate-400">PDB (Nominal)</span>
                                 <span class="text-slate-700 font-extrabold">
-                                    ${{ $selectedCountry->gdpData()->orderBy('year', 'desc')->first() ? number_format($selectedCountry->gdpData()->orderBy('year', 'desc')->first()->gdp_value / 1e9, 2) . ' B' : 'N/A' }}
+                                    ${{ $selectedCountry->gdpData()->orderBy('year', 'desc')->first() && $selectedCountry->gdpData()->orderBy('year', 'desc')->first()->gdp_value !== null ? number_format($selectedCountry->gdpData()->orderBy('year', 'desc')->first()->gdp_value / 1e9, 2) . ' B' : 'N/A' }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between text-sm font-semibold py-0.5">
                                 <span class="text-slate-400">Tingkat Inflasi</span>
                                 <span class="text-slate-700 font-extrabold">
-                                    {{ $selectedCountry->inflationData()->orderBy('year', 'desc')->first() ? number_format($selectedCountry->inflationData()->orderBy('year', 'desc')->first()->inflation_rate, 2) . '%' : 'N/A' }}
+                                    {{ $selectedCountry->inflationData()->orderBy('year', 'desc')->first() && $selectedCountry->inflationData()->orderBy('year', 'desc')->first()->inflation_rate !== null ? number_format($selectedCountry->inflationData()->orderBy('year', 'desc')->first()->inflation_rate, 2) . '%' : 'N/A' }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between text-sm font-semibold py-0.5">
