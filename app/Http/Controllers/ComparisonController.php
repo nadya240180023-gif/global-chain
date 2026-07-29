@@ -25,6 +25,7 @@ class ComparisonController extends Controller
 
     public function index(Request $request)
     {
+        set_time_limit(120);
         $countries = Country::orderBy('name')->get();
 
         $countryCode1 = $request->query('country1', 'DE');

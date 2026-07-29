@@ -28,7 +28,7 @@ class ApiSyncService
     public function syncCountries(): int
     {
         try {
-            $response = Http::timeout(45)
+            $response = Http::timeout(10)
                 ->withoutVerifying()
                 ->get('https://restcountries.com/v3.1/all');
 
@@ -106,14 +106,14 @@ class ApiSyncService
 
         try {
             // Fetch GDP Values (last 10 years)
-            $gdpResponse = Http::timeout(30)->withoutVerifying()
+            $gdpResponse = Http::timeout(10)->withoutVerifying()
                 ->get("https://api.worldbank.org/v2/country/{$code}/indicator/{$indicators['gdp']}?format=json&date=2015:2025");
 
             $gdpData = $gdpResponse->json();
             $gdpList = $gdpData[1] ?? [];
 
             // Fetch GDP Growth
-            $growthResponse = Http::timeout(30)->withoutVerifying()
+            $growthResponse = Http::timeout(10)->withoutVerifying()
                 ->get("https://api.worldbank.org/v2/country/{$code}/indicator/{$indicators['gdp_growth']}?format=json&date=2015:2025");
             $growthData = $growthResponse->json();
             $growthList = $growthData[1] ?? [];
@@ -138,7 +138,7 @@ class ApiSyncService
             }
 
             // Fetch Inflation Rates
-            $infResponse = Http::timeout(30)->withoutVerifying()
+            $infResponse = Http::timeout(10)->withoutVerifying()
                 ->get("https://api.worldbank.org/v2/country/{$code}/indicator/{$indicators['inflation']}?format=json&date=2015:2025");
             $infData = $infResponse->json();
             $infList = $infData[1] ?? [];
@@ -155,7 +155,7 @@ class ApiSyncService
             }
 
             // Fetch Population trends
-            $popResponse = Http::timeout(30)->withoutVerifying()
+            $popResponse = Http::timeout(10)->withoutVerifying()
                 ->get("https://api.worldbank.org/v2/country/{$code}/indicator/{$indicators['population']}?format=json&date=2015:2025");
             $popData = $popResponse->json();
             $popList = $popData[1] ?? [];
@@ -184,7 +184,7 @@ class ApiSyncService
     public function syncExchangeRates(): bool
     {
         try {
-            $response = Http::timeout(20)->withoutVerifying()
+            $response = Http::timeout(5)->withoutVerifying()
                 ->get('https://open.er-api.com/v6/latest/USD');
 
             if ($response->failed()) return false;
@@ -229,7 +229,7 @@ class ApiSyncService
         }
 
         try {
-            $response = Http::timeout(20)->withoutVerifying()
+            $response = Http::timeout(5)->withoutVerifying()
                 ->get("https://api.open-meteo.com/v1/forecast", [
                     'latitude' => $country->latitude,
                     'longitude' => $country->longitude,
