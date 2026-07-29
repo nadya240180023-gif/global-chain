@@ -39,7 +39,7 @@ class ComparisonController extends Controller
         // Trigger real-time sync of all exchange rates from open.er-api.com on load
         try {
             $this->apiSync->syncExchangeRates();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             logger()->error("ComparisonController failed to sync exchange rates real-time: " . $e->getMessage());
         }
 
@@ -52,7 +52,7 @@ class ComparisonController extends Controller
                     $this->apiSync->syncWorldBankData($country);
                     $this->apiSync->syncNews($country);
                     $this->scoringEngine->calculate($country);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     // Fail silently or log error, keep showing existing DB data if API fails
                     logger()->error("Failed to sync real-time data for " . $country->name . ": " . $e->getMessage());
                 }
